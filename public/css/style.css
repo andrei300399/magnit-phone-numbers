@@ -32,8 +32,21 @@ body {
   margin: 0;
 }
 
+body::-webkit-scrollbar {
+  width: 0 !important
+}
+
+body {
+  -ms-overflow-style: none;
+}
+
+body {
+  overflow: -moz-scrollbars-none;
+}
+
 .invalid {
   color: red;
+  /* поменять */
 }
 
 
@@ -64,6 +77,7 @@ body {
 
 
 .card__employee {
+  
   display: flex;
   flex-direction: column;
   justify-content: start;
@@ -88,7 +102,7 @@ body {
 }
 
 .card__employee__account-text {
-  min-width: 265px;
+  width: 265px;
   min-height: 27px;
   border: none;
   border-bottom: 1px solid #000000;
@@ -290,13 +304,23 @@ body {
   font-size: 20px;
   line-height: 30px;
   color: #FFFFFF;
-  transition: all 500ms ease;
+  transition: all 0.5s ease;
+}
+
+.card__employee__numbers__button-save:hover {
+  background-color: #ff0011;
+
+  transition: all 0.5s ease;
 }
 
 .card__employee__numbers__button-save:active {
-  opacity: 1;
+  background-color: #ffffff;
+  /* color: #000000; */
+  color: #E30613;
+  transition: all 0.1s ease;
+  /* opacity: 1;
   filter: alpha(opacity=100);
-  transition: all 0.5s ease;
+  transition: all 0.5s ease; */
 }
 
 .card__employee__account__button-exit-mobile {
@@ -334,7 +358,21 @@ body {
   line-height: 30px;
   color: #000000;
   display: none;
+  transition: all 0.5s ease;
+}
 
+.card__employee__account-admin-only__button-save:hover,
+.card__employee__account__button-exit:hover {
+  background-color: #e4e4e4b9;
+  border-color: #dbdbdb00;
+  transition: all 0.5s ease;
+}
+
+.card__employee__account-admin-only__button-save:active,
+.card__employee__account__button-exit:active {
+  border-color: #dbdbdb00;
+  background-color: #ffffff;
+  transition: all 0.1s ease;
 }
 
 .card__employee__account-admin-only__button-save {
@@ -355,12 +393,7 @@ body {
 }
 
 
-.card__employee__account__button-exit:active,
-.card__employee__account__button-exit-mobil:active {
-  opacity: 1;
-  filter: alpha(opacity=100);
-  transition: all 0.5s ease;
-}
+
 
 .card__warning {
   width: 299px;
@@ -369,10 +402,17 @@ body {
   line-height: 27px;
   margin: 229px 16px 42px 0;
   color: rgba(0, 0, 0, 0.7);
-
 }
 
-.footer {
+
+.card__instead-of-warning {
+  display: block;
+  width: 299px;
+  height: 10px; 
+  margin-bottom: 132px;
+}
+
+.footer { 
   display: flex;
   justify-content: space-between;
   align-items: start;
@@ -471,6 +511,10 @@ body {
 
 @media (min-width: 1170px) {
 
+  .card__instead-of-warning{
+    display: none;
+  }
+
   .input__number-error-message {
     top: 55px;
     left: 50px;
@@ -493,6 +537,7 @@ body {
   }
 
   .card__employee {
+    background-color: #E2E2E2;
     flex-direction: row;
     justify-content: space-between;
     align-items: flex-start;
@@ -537,7 +582,7 @@ body {
   .card__employee__account-text {
     font-size: 20px;
     line-height: 30px;
-    min-width: 401px;
+    width: 401px;
     min-height: 27px;
     padding-left: 11px;
 
@@ -547,9 +592,10 @@ body {
     display: none;
   }
 
-  .card__employee__table-link {
+  .card__employee__table-link {    
     display: flex;
-    flex-wrap: nowrap;
+    flex-direction: column;
+    flex-wrap: wrap;
     justify-content: start;
     text-decoration: none;
     width: 449px;
@@ -557,11 +603,22 @@ body {
     margin-bottom: 64px;
   }
 
+  .card__employee__table-link__link {
+    display: flex;
+    flex-direction: column;
+    flex-wrap: wrap;
+    justify-content: start;
+    text-decoration: none;
+    width: 159px;
+    height: 35px;
+  }
+
   .card__employee__table-link-text {
     margin: 0;
     font-size: 20px;
     line-height: 30px;
-    color: #000000;
+    color: #000000;   
+
   }
 
   .left-arrow {

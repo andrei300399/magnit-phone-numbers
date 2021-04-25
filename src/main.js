@@ -11,6 +11,8 @@ import FileSaver from 'file-saver';
 import VueObserveVisibility from 'vue-observe-visibility'
 
 Vue.use(VueObserveVisibility)
+// Vue.component("vue-context", VueContext)
+// Vue.use(VueContext)
 
 var infiniteScroll =  require('vue-infinite-scroll');
 Vue.use(infiniteScroll)

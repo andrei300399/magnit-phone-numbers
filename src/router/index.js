@@ -4,14 +4,19 @@ import VueRouter from 'vue-router'
 Vue.use(VueRouter)
 
 const routes = [{
-    path: '/account',
+    path: '/lk',
     name: 'account',
     component: () => import("../views/Account.vue"),
   },
   {
-    path: '/admin',
+    path: '/numbers',
     name: 'admin',
     component: () => import("../views/Admin.vue"),
+  },
+  {
+    path: '/',
+    name: 'login',
+    component: () => import("../views/Login.vue"),
   },
 ]
 
