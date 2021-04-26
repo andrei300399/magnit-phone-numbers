@@ -1,11 +1,13 @@
 <template>
-  <div class="full-screen-background">
+  <div class="suc-full-screen-background">
     <div class="confirm-message-frame">
       <p class="confirm-message-frame__message-text">
         {{ message }}
       </p>
       <form class="confirm-message-frame__form" @submit.prevent="onOK">
-        <button type="submit" class="confirm-message-frame__button-ok">ОК</button>
+        <button type="submit" class="confirm-message-frame__button-ok">
+          ОК
+        </button>
       </form>
     </div>
   </div>
@@ -13,10 +15,10 @@
 
 <script>
 export default {
-  props: ["message"],  
+  props: ["message"],
   methods: {
     onOK() {
-       this.$emit('ok');
+      this.$emit("ok");
     },
   },
 };
@@ -40,8 +42,9 @@ body {
   font-weight: 400;
 }
 
-.full-screen-background {
-  position: fixed;
+.suc-full-screen-background {
+  position: fixed !important;
+
   display: flex;
   justify-content: center;
   align-items: center;
@@ -51,7 +54,7 @@ body {
   width: 100%;
   background: rgba(216, 216, 216, 0.71);
   z-index: 101;
-   transform: all 0.5s ease;
+  transform: all 0.5s ease;
 }
 
 .confirm-message-frame {
@@ -65,7 +68,7 @@ body {
   min-height: 200px;
   background: #fff5f5;
   border-radius: 50px;
-   transform: all 0.5s ease;
+  transform: all 0.5s ease;
 }
 
 .confirm-message-frame__message-text {

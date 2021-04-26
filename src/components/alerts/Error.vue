@@ -1,5 +1,5 @@
 <template>
-  <div class="full-screen-background">
+  <div class="err-full-screen-background">
     <div class="error-message-frame">
       <p class="error-message-frame__heading">ОШИБКА!</p>
       <p class="error-message-frame__message-text">
@@ -32,8 +32,8 @@ body {
   font-weight: 400;
 }
 
-.full-screen-background {
-  position: fixed;
+.err-full-screen-background {
+  position: fixed !important;
   display: flex;
   justify-content: center;
   align-items: center;

@@ -27,10 +27,10 @@ export default {
   props: ["message", "index"],
   methods: {
     Accept() {
-      this.$emit("DeleteNumber", true, this.index);
+      this.$emit("ConfirmAction", {answer: true, index: this.index});
     },
     Decline() {
-      this.$emit("DeleteNumber", false, this.index);
+      this.$emit("ConfirmAction", {answer: false, index: this.index});
     },
   },
 };

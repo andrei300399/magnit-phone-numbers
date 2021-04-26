@@ -27,7 +27,7 @@
       v-if="ConfirmDeleteNumberVisible"
       :message="this.ConfirmDeleteNumberMessage"
       :index="ConfirmDeleteNumberIndex"
-      @DeleteNumber="DeleteNumber"
+      @ConfirmAction="DeleteNumber"
     />
 
     <ConfirmNumber
@@ -328,11 +328,15 @@ export default {
       }
     },
 
-    async DeleteNumber(agreement, idx) {
+    async DeleteNumber(resp) {      
+
       this.ConfirmDeleteNumberVisible = false;
-      if (!agreement) {
+      if (!resp.answer) {
         return;
       }
+       this.loading = true;
+      const idx = this.ConfirmDeleteNumberIndex;
+
       axios.defaults.headers.common["Authorization"] = `${this.email}`;
       await axios
         .post(
@@ -357,6 +361,7 @@ export default {
           this.ErrorMessage = "Что-то пошло не так";
           this.ErrorVisible = true;
         });
+         this.loading = false;
     },
     logout() {
       alert("Выход");

@@ -21,10 +21,10 @@ export default {
   props: ["message"],
   methods: {
     Accept() {
-      this.$emit("SaveInfo", true);
+      this.$emit("handleConfirmation", {answer: true});
     },
     Decline() {
-        this.$emit("SaveInfo", false);
+        this.$emit("handleConfirmation", {answer: false});
     },
   },
 };

@@ -8,7 +8,7 @@
     <Confirm-admin-saving
       v-if="ConfirmSavingAdminVisible"
       :message="this.ConfirmSavingAdminMessage"
-      @SaveInfo="AdminSavePersonalInfo"
+      @handleConfirmation="AdminSavePersonalInfo"
     />
     <Error
       v-if="ErrorVisible"
@@ -19,7 +19,7 @@
       v-if="ConfirmDeleteNumberVisible"
       :message="this.ConfirmDeleteNumberMessage"
       :index="ConfirmDeleteNumberIndex"
-      @DeleteNumber="DeleteNumber"
+      @ConfirmAction="DeleteNumber"
     />
 
     <div v-if="loading" class="lk-loader">
@@ -32,13 +32,21 @@
             class="light-hover edit__card__employee__table-link__link"
             v-on:click.prevent="closeForm()"
           >
-            <img src="img/right 1.svg" alt="к таблице" class="edit__left-arrow" />
+            <img
+              src="img/right 1.svg"
+              alt="к таблице"
+              class="edit__left-arrow"
+            />
             <p class="edit__card__employee__table-link-text">К таблице</p>
           </a>
         </div>
 
         <div class="edit__card__employee__account">
-          <img class="edit__card__employee__avatar" src="img/Ава.svg" alt="avatar" />
+          <img
+            class="edit__card__employee__avatar"
+            src="img/Ава.svg"
+            alt="avatar"
+          />
           <!-- @submit.prevent="handleSubmitAdmin"          -->
           <form
             v-if="isAdmin && width >= 1170"
@@ -118,7 +126,7 @@
               name="dateOfBirth"
               class="edit__card__employee__account-text edit__admin-only-input"
               placeholder="Выберете дату рождения"
-              value="email"
+              value="date"
               :class="{
                 invalid: $v.dateOfBirth.$dirty && !$v.dateOfBirth.required,
               }"
@@ -131,6 +139,7 @@
             </p>
 
             <p class="edit__card__employee__account-text">{{ email }}</p>
+
             <input
               v-model="post"
               type="text"
@@ -208,7 +217,7 @@
               <img
                 class="edit__delete-number__minus light-hover"
                 src="img/Минус.svg"
-                alt="Удалить номер"             
+                alt="Удалить номер"
                 v-on:click="removeOldPhone(idx)"
               />
               <div
@@ -390,9 +399,9 @@ export default {
       this.ErrorVisible = false;
     },
 
-    async AdminSavePersonalInfo(agreement) {
+    async AdminSavePersonalInfo(resp) {
       this.ConfirmSavingAdminVisible = false;
-      if (!agreement) {
+      if (!resp.answer) {
         return;
       }
 
@@ -483,11 +492,15 @@ export default {
       console.log("jfhdjfgk");
       this.SuccessVisible = true;
     },
-    async DeleteNumber(agreement, idx) {
+    async DeleteNumber(resp) {
       this.ConfirmDeleteNumberVisible = false;
-      if (!agreement) {
+      if (!resp.answer) {
         return;
       }
+
+      this.loading = true;
+
+      const idx = this.ConfirmDeleteNumberIndex;
       axios.defaults.headers.common["Authorization"] = `${this.email}`;
       await axios
         .post(
@@ -515,6 +528,7 @@ export default {
           this.ErrorMessage = "Что-то пошло не так";
           this.ErrorVisible = true;
         });
+      this.loading = false;
     },
     logout() {
       alert("Выход");

@@ -21,10 +21,10 @@ export default {
   props: ["message"],
   methods: {
     Accept() {
-      this.$emit("DeleteNumber", true);
+      this.$emit("DeleteNumber", {answer: true});
     },
     Decline() {
-        this.$emit("DeleteNumber", false);
+        this.$emit("DeleteNumber", {answer: false});
     },
   },
 };
