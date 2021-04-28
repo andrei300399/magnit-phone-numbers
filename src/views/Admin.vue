@@ -104,6 +104,8 @@
               id="input__file"
               accept=".xlsx"
               class="input__file"
+              ref="file"
+              v-on:change="handleFileUpload()"
             />
 
             <label for="input__file">
@@ -131,6 +133,7 @@
               v-model="searchString"
               type="text"
               placeholder="Поиск..."
+              v-on:change="clearSearch()"
             />
 
             <div class="flex-right">
@@ -483,6 +486,8 @@ export default {
 
     editUserFormVisible: false,
     editUserEmail: "",
+
+    file: "",
   }),
 
   validations: {
@@ -492,6 +497,42 @@ export default {
     await this.fetch();
   },
   methods: {
+    async clearSearch() {
+      if (this.searchString !== "") {
+        return;
+      }
+      this.loading = true;
+      this.search = false;
+      this.users = [];
+      console.log("Пусто - выросла капуста!");
+      this.indexOfLastUser = -1;
+      if (this.sorted) {
+        this.get = false;
+        this.path = `sort_${this.sortCategory[this.sortIndex].path}?`;
+        await this.fetch();
+        return;
+      }
+
+      this.get = true;
+      this.path = this.defaultPath;
+      await this.fetch();
+    },
+    async handleFileUpload() {
+      this.file = this.$refs.file.files[0];
+      let excel_file = new FormData();
+      excel_file.append("file", this.file);
+      console.log(excel_file.get("file"));
+      await axios
+        .post(`/import`, excel_file)
+        .then((response) => {
+          console.log(response);
+          console.log("Наконец-то");
+        })
+        .catch((response) => {
+          console.log(response);
+          console.log("Опять провал");
+        });
+    },
     async DeleteUser(resp) {
       this.ConfirmDeleteUserVisible = false;
 
