@@ -189,7 +189,7 @@ export default {
     phones: [],
 
     // isAdmin: true,
-    isAdmin: false,
+    isAdmin: true,
 
     firstname: "",
     oldFirstname: "",
