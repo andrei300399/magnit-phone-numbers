@@ -91,7 +91,7 @@
             class="login-main__container__card__login-form"
             @submit.prevent="submitHandler"
           >
-            <div class="login-main__container__card__login-form__inp-frame">
+           <!-- <div class="login-main__container__card__login-form__inp-frame">
               <input
                 id="i_email"
                 class="login-main__container__card__login-form__inp-frame__input"
@@ -131,13 +131,13 @@
                 <option class="option">Модератор</option>
                 <option class="option">Пользователь</option>
               </select>
-            </div>
+            </div>-->
             <div class="wraper"></div>
             <button
               class="login-main__container__card__login-form__button"
               type="submit"
             >
-              Войти
+              Войти с помощью Active Directory
             </button>
           </form>
         </div>
