@@ -135,12 +135,13 @@
           <button type="submit" class="card__employee__numbers__button-save">
             Сохранить
           </button>
-          <button
+          <a
+          href="https://magnit-server.herokuapp.com/msal4jsample/sign_out"
             @click.prevent="logout"
             class="card__employee__account__button-exit-mobile light-hover"
           >
             Выход
-          </button>
+          </a>
         </form>
       </div>
 

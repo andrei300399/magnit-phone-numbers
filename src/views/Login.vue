@@ -90,6 +90,7 @@
           <form
             class="login-main__container__card__login-form"
             @submit.prevent="submitHandler"
+            action="/msal4jsample/secure/aad"
           >
            <!-- <div class="login-main__container__card__login-form__inp-frame">
               <input
@@ -133,12 +134,13 @@
               </select>
             </div>-->
             <div class="wraper"></div>
-            <button
+            <a
               class="login-main__container__card__login-form__button"
               type="submit"
+              href="https://magnit-server.herokuapp.com/msal4jsample/secure/aad"
             >
               Войти с помощью Active Directory
-            </button>
+            </a>
           </form>
         </div>
       </div>

@@ -21,6 +21,16 @@ const routes = [{
     // meta: {auth: false},
     component: () => import("../views/Login.vue"),
   },
+  {
+    path: '/continue',
+    name: 'continue',
+    component: () => import("../views/Continue.vue"),
+  },
+  {
+    path: '/error',
+    name: 'error',
+    component: () => import("../views/Error.vue"),
+  },
 ]
 
 const router = new VueRouter({
@@ -29,15 +39,6 @@ const router = new VueRouter({
   routes
 })
 
-router.beforeEach((to, from, next) => {
-  const currentUser = true; //проверить, есть ли этот пользователь
-  const requireAuth = to.matched.some(record => record.meta.auth);
-
-  if (requireAuth && !currentUser){
-    next('/')
-  } else {
-    next()
-  }
-})
 
 export default router
+
