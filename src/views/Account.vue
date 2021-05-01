@@ -27,7 +27,7 @@
       v-if="ConfirmDeleteNumberVisible"
       :message="this.ConfirmDeleteNumberMessage"
       :index="ConfirmDeleteNumberIndex"
-      @DeleteNumber="DeleteNumber"
+      @ConfirmAction="DeleteNumber"
     />
 
     <ConfirmNumber
@@ -62,8 +62,8 @@
               {{ lastname }} {{ firstname }} {{ middlename }}  
             </p>
             <p class="card__employee__account-text">
-              {{ dateOfBirth }}
-               <!-- {{ dateOfBirth | date("date") }} -->
+              
+               {{ dateOfBirth | date("date") }}
             </p>
             <p class="card__employee__account-text">{{ email }}</p>
             <p class="card__employee__account-text">{{ department }}</p>
@@ -175,7 +175,6 @@ import { required, minLength } from "vuelidate/lib/validators";
 import Loader from "../components/Loader.vue";
 import axios from "axios";
 import Success from "../components/alerts/Success.vue";
-
 import Error from "../components/alerts/Error.vue";
 import ConfirmDeleteNumber from "../components/alerts/ConfirmDeleteNumber.vue";
 import ConfirmAdminSaving from "../components/alerts/ConfirmAdminSaving.vue";
@@ -191,7 +190,7 @@ export default {
     phones: [],
 
     // isAdmin: true,
-    isAdmin: false,
+    isAdmin: true,
 
     firstname: "",
     oldFirstname: "",
@@ -267,8 +266,8 @@ export default {
           this.post = response.data.post || "";
           this.oldPost = response.data.post || "";
           this.department = response.data.division || "";
-          this.oldDepartment = response.data.division || "";
-          this.dateOfBirth = response.data.birthday || "";
+          this.oldDepartment = response.data.division || "";         
+          this.dateOfBirth = response.data.birthday || new Date();
 
           axios
             .get(`${process.env.VUE_APP_PROXY}/get_numbers`, {
@@ -329,11 +328,15 @@ export default {
       }
     },
 
-    async DeleteNumber(agreement, idx) {
+    async DeleteNumber(resp) {      
+
       this.ConfirmDeleteNumberVisible = false;
-      if (!agreement) {
+      if (!resp.answer) {
         return;
       }
+       this.loading = true;
+      const idx = this.ConfirmDeleteNumberIndex;
+
       axios.defaults.headers.common["Authorization"] = `${this.email}`;
       await axios
         .post(
@@ -358,6 +361,7 @@ export default {
           this.ErrorMessage = "Что-то пошло не так";
           this.ErrorVisible = true;
         });
+         this.loading = false;
     },
     logout() {
       alert("Выход");

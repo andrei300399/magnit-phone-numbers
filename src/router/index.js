@@ -6,16 +6,19 @@ Vue.use(VueRouter)
 const routes = [{
     path: '/lk',
     name: 'account',
+    meta: {auth: true},
     component: () => import("../views/Account.vue"),
   },
   {
     path: '/numbers',
     name: 'admin',
+    meta: {auth: true},
     component: () => import("../views/Admin.vue"),
   },
   {
     path: '/',
     name: 'login',
+    // meta: {auth: false},
     component: () => import("../views/Login.vue"),
   },
   {
@@ -36,4 +39,6 @@ const router = new VueRouter({
   routes
 })
 
+
 export default router
+

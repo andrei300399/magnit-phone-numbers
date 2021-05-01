@@ -24,13 +24,13 @@
 
 <script>
 export default {
-  props: ["message", "index"],
+  props: ["message", "email"],
   methods: {
     Accept() {
-      this.$emit("ConfirmAction", {answer: true, index: this.index});
+      this.$emit("ConfirmAction", {answer: true, email: this.email});
     },
     Decline() {
-      this.$emit("ConfirmAction", {answer: false, index: this.index});
+      this.$emit("ConfirmAction", {answer: false, email: this.email});
     },
   },
 };

@@ -48,6 +48,25 @@
       @close="JustCloseAddForm()"
     />
 
+    <Success
+      v-if="SuccessVisible"
+      :message="this.SuccessMessage"
+      @ok="CloseSuccessAlert"
+    />
+
+    <Error
+      v-if="ErrorVisible"
+      :message="this.ErrorMessage"
+      @ok="CloseErrorAlert"
+    />
+
+    <Confirm-delete-user
+      v-if="ConfirmDeleteUserVisible"
+      :message="this.ConfirmDeleteUserMessage"
+      :email="ConfirmDeleteUserEmail"
+      @ConfirmAction="DeleteUser"
+    />
+
     <vue-context
       ref="menu"
       :close-on-click="true"
@@ -57,13 +76,13 @@
       <template slot-scope="child">
         <li
           class="context-menu__option"
-          @click="onContextClick($event, true, child.data)"
+          @click="onContextClickEdit($event, child.data)"
         >
           <p class="context-menu__option__edit">Редактировать</p>
         </li>
         <li
           class="context-menu__option"
-          @click="onContextClick($event, false, child.data)"
+          @click="onContextClickRemove($event, child.data)"
         >
           <p class="context-menu__option__delete">Удалить</p>
         </li>
@@ -85,6 +104,8 @@
               id="input__file"
               accept=".xlsx"
               class="input__file"
+              ref="file"
+              v-on:change="handleFileUpload()"
             />
 
             <label for="input__file">
@@ -106,13 +127,13 @@
           </div>
           <div class="main__menu__form__search">
             <input
-            
-             @keydown.enter.prevent="doSearch()"
+              @keydown.enter.prevent="doSearch()"
               class="main__menu__form__search__input"
               name="search"
               v-model="searchString"
               type="text"
               placeholder="Поиск..."
+              v-on:change="clearSearch()"
             />
 
             <div class="flex-right">
@@ -379,10 +400,21 @@ import { saveAs } from "file-saver";
 import axios from "axios";
 import EditUser from "../components/EditUser.vue";
 import AddUser from "../components/AddUser.vue";
+import ConfirmDeleteUser from "../components/alerts/ConfirmDeleteUser.vue";
+import Success from "../components/alerts/Success.vue";
+import Error from "../components/alerts/Error.vue";
+
 import VueContext from "vue-context";
 
 export default {
-  components: { EditUser, AddUser, VueContext },
+  components: {
+    EditUser,
+    AddUser,
+    VueContext,
+    ConfirmDeleteUser,
+    Success,
+    Error,
+  },
   name: "admin",
   data: () => ({
     category: 6, // хранится айдишник
@@ -393,6 +425,16 @@ export default {
     middlename: "Геннадьевич",
     lastname: "Пак",
     email: "pack.vg@agabon.ru",
+
+    ConfirmDeleteUserVisible: false,
+    ConfirmDeleteUserMessage: "",
+    ConfirmDeleteUserEmail: "",
+
+    SuccessVisible: false,
+    SuccessMessage: false,
+
+    ErrorVisible: false,
+    ErrorMessage: false,
 
     search: false,
     searchString: "",
@@ -414,11 +456,11 @@ export default {
     pathToUpdateUsers: "users?",
 
     sortCategory: [
-      { id: 5, name: "ФИО", path: "fio", selected: false }, //0
-      { id: 1, name: "почта", path: "email", selected: false }, //1
-      { id: 2, name: "отдел", path: "division", selected: false }, //2
-      { id: 3, name: "должность", path: "post", selected: false }, //3
-      { id: 6, name: "дата рождения", path: "birthday", selected: false }, //4
+      { id: 5, name: "ФИО", path: "fio", selected: false, ascendingOrder: true, }, //0
+      { id: 1, name: "почта", path: "email", selected: false, ascendingOrder: true }, //1
+      { id: 2, name: "отдел", path: "division", selected: false, ascendingOrder: true }, //2
+      { id: 3, name: "должность", path: "post", selected: false, ascendingOrder: true }, //3
+      { id: 6, name: "дата рождения", path: "birthday", selected: false, ascendingOrder: true }, //4
     ],
 
     alreadyScrolled: true,
@@ -444,6 +486,8 @@ export default {
 
     editUserFormVisible: false,
     editUserEmail: "",
+
+    file: "",
   }),
 
   validations: {
@@ -453,6 +497,86 @@ export default {
     await this.fetch();
   },
   methods: {
+    async clearSearch() {
+      if (this.searchString !== "") {
+        return;
+      }
+      this.loading = true;
+      this.search = false;
+      this.users = [];
+      console.log("Пусто - выросла капуста!");
+      this.indexOfLastUser = -1;
+      if (this.sorted) {
+        this.get = false;
+        this.path = `sort_${this.sortCategory[this.sortIndex].path}?`;
+        await this.fetch();
+        return;
+      }
+
+      this.get = true;
+      this.path = this.defaultPath;
+      await this.fetch();
+    },
+    async handleFileUpload() {
+      this.file = this.$refs.file.files[0];
+      let excel_file = new FormData();
+      excel_file.append("file", this.file);
+      console.log(excel_file.get("file"));
+      await axios
+        .post(`/import`, excel_file)
+        .then((response) => {
+          console.log(response);
+          console.log("Наконец-то");
+        })
+        .catch((response) => {
+          console.log(response);
+          console.log("Опять провал");
+        });
+    },
+    async DeleteUser(resp) {
+      this.ConfirmDeleteUserVisible = false;
+
+      if (!resp.answer) {
+        return;
+      }
+
+      this.loading = true;
+
+      axios.defaults.headers.common[
+        "Authorization"
+      ] = `${this.ConfirmDeleteUserEmail}`;
+      await axios
+        .get(`${process.env.VUE_APP_PROXY}/delete_user`)
+        .then((response) => {
+          if (response.data.status == "SUCCESS") {
+            // alert(`Номер ${this.phones[idx].phone} успешно удалён`);
+            this.SuccessMessage = `Пользователь успешно удалён`;
+            this.SuccessVisible = true;
+            this.users = [];
+            this.indexOfLastUser = -1;
+          } else {
+            // alert("Ошибка соединения с сервером! Повторите попытку позже");
+            this.loading = false;
+
+            this.ErrorMessage =
+              "Ошибка соединения с сервером! Повторите попытку позже";
+            this.ErrorVisible = true;
+          }
+        })
+        .catch((err) => {
+          this.loading = false;
+          this.ErrorMessage = "Что-то пошло не так";
+          this.ErrorVisible = true;
+        });
+
+      await this.fetch();
+    },
+    CloseSuccessAlert() {
+      this.SuccessVisible = false;
+    },
+    CloseErrorAlert() {
+      this.ErrorVisible = false;
+    },
     rotateArrow(index, direction) {
       let arrowId = "arrow" + index;
       let headingId = "heading" + index;
@@ -590,22 +714,26 @@ export default {
       await this.fetch();
     },
 
-    onContextClick(event, option, formData) {
-      console.log(formData);
-      if (option) {
-        console.log(
-          "Редактировать пользователя " + this.users[formData.idx].last_name
-        );
-        console.log("email " + this.users[formData.idx].email);
-        this.editUserEmail = this.users[formData.idx].email;
-        this.editUserFormVisible = true;
-      }
-      if (!option) {
-        console.log(
-          "удалить пользователя " + this.users[formData.idx].last_name
-        );
-      }
+    onContextClickEdit(event, formData) {
+      console.log(
+        "Редактировать пользователя " + this.users[formData.idx].last_name
+      );
+      console.log("email " + this.users[formData.idx].email);
+
+      this.editUserEmail = this.users[formData.idx].email;
+      this.editUserFormVisible = true;
     },
+
+    onContextClickRemove(event, formData) {
+      this.ConfirmDeleteUserMessage = `Вы действительно хотите удалить пользователя ${
+        this.users[formData.idx].last_name
+      } ${this.users[formData.idx].first_name} ${
+        this.users[formData.idx].middle_name
+      }?`;
+      this.ConfirmDeleteUserEmail = this.users[formData.idx].email;
+      this.ConfirmDeleteUserVisible = true;
+    },
+
     tableOnScroll(event) {
       if (this.users.length === 0) {
         return;
