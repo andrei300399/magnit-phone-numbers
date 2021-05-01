@@ -18,6 +18,16 @@ const routes = [{
     name: 'login',
     component: () => import("../views/Login.vue"),
   },
+  {
+    path: '/continue',
+    name: 'continue',
+    component: () => import("../views/Continue.vue"),
+  },
+  {
+    path: '/error',
+    name: 'error',
+    component: () => import("../views/Error.vue"),
+  },
 ]
 
 const router = new VueRouter({
