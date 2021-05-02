@@ -208,7 +208,7 @@ export default {
     oldDepartment: "",
 
    
-    email: "pack.vg@agabon.ru",   
+    email: "test_admin@magnitversion2.onmicrosoft.com",   
     dateOfBirth: "",
     avatar: null,
     loading: true,
@@ -252,6 +252,7 @@ export default {
       .get(`${process.env.VUE_APP_PROXY}/user`, {
         headers: {
           Authorization: this.email,
+         'Access-Control-Allow-Origin': '*',
         },
       })
       .then((response) => {
@@ -269,10 +270,14 @@ export default {
           this.oldDepartment = response.data.division || "";         
           this.dateOfBirth = response.data.birthday || new Date();
 
+
+    
+
           axios
             .get(`${process.env.VUE_APP_PROXY}/get_numbers`, {
               headers: {
                 Authorization: this.email,
+                 'Access-Control-Allow-Origin': '*',
               },
             })
             .then((phones) => {

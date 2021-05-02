@@ -172,14 +172,14 @@ input::placeholder {
 }
 
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
+input:-webkit-autofill:hover,
 input:-webkit-autofill:focus,
 textarea:-webkit-autofill,
 textarea:-webkit-autofill:hover,
 textarea:-webkit-autofill:focus,
 select:-webkit-autofill,
 select:-webkit-autofill:hover,
-select:-webkit-autofill:focus {    
+select:-webkit-autofill:focus {
     border: none;
     text-decoration: none;
     outline: none;
@@ -195,9 +195,12 @@ select:-webkit-autofill:focus {
 }
 
 input:-webkit-autofill {
-    -webkit-box-shadow: inset 0 0 0 50px rgba(246, 246, 246, 1) !important; /* Цвет фона */
-    -webkit-text-fill-color:#000000 !important; /* цвет текста */
-    color: #999 !important; /* цвет текста */
+    -webkit-box-shadow: inset 0 0 0 50px rgba(246, 246, 246, 1) !important;
+    /* Цвет фона */
+    -webkit-text-fill-color: #000000 !important;
+    /* цвет текста */
+    color: #999 !important;
+    /* цвет текста */
 }
 
 .login-main__container__card__login-form__inp-frame__input::-webkit-input-placeholder {
@@ -331,6 +334,12 @@ input:-webkit-autofill {
     line-height: 30px;
 
     color: #FFFFFF;
+
+    font-size: 10px;
+    line-height: 20px;
+    margin-top: 18px;
+
+    text-align: center;
 }
 
 .login-main__container__card__login-form__button:hover {
@@ -498,6 +507,7 @@ input:-webkit-autofill {
         height: 198px;
         /* height: 649px - padleft*2 (2*65) =  */
         padding: 65px 65px 65px 65px;
+        margin-top: 120px;
     }
 
     .login-main__container__card__login-form__inp-frame {
@@ -574,6 +584,7 @@ input:-webkit-autofill {
         order: 0;
         flex-grow: 0;
         margin: 0px 10px;
+       
 
     }
 
