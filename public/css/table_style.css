@@ -434,12 +434,12 @@ html {
 
 .content-table {
   margin: none;
-  width: 1320px;
+  /* width: 1320px; */
   font-style: normal;
   border-collapse: collapse;
   table-layout: fixed;
   font-weight: normal;
-  font-size: 18px;
+  font-size: 14px;
   line-height: 27px;
   text-align: center;
   padding: 0;
@@ -490,9 +490,15 @@ html {
 }
 */
 
+
+
+
 .content-table thead td {
+  font-weight: 700;
+  position: sticky;
+  background-color: rgb(231, 197, 197);
   border-bottom: 1px solid #000000;
-  font-size: 20px;
+  font-size: 14px;
   line-height: 30px;
   padding-top: 16px;
   padding-bottom: 16px;
@@ -500,6 +506,7 @@ html {
   padding-right: 24px;
   max-height: 91.94px !important;
   max-width: 220px !important;
+  
 }
 
 
@@ -510,9 +517,11 @@ html {
   border: none;
   border-right: 1px solid #000000;
   margin: 0;
-  padding: 0;
+  padding: 5;
   padding-top: 43px;
   padding-bottom: 35px;
+
+  word-wrap: break-word;
 
 }
 
