@@ -104,6 +104,7 @@ body {
 .card__employee__account-text {
   width: 265px;
   min-height: 27px;
+  overflow: auto;
   border: none;
   border-bottom: 1px solid #000000;
   font-family: 'Loew Next', sans-serif;

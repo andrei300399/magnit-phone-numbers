@@ -456,11 +456,41 @@ export default {
     pathToUpdateUsers: "users?",
 
     sortCategory: [
-      { id: 5, name: "ФИО", path: "fio", selected: false, ascendingOrder: true, }, //0
-      { id: 1, name: "почта", path: "email", selected: false, ascendingOrder: true }, //1
-      { id: 2, name: "отдел", path: "division", selected: false, ascendingOrder: true }, //2
-      { id: 3, name: "должность", path: "post", selected: false, ascendingOrder: true }, //3
-      { id: 6, name: "дата рождения", path: "birthday", selected: false, ascendingOrder: true }, //4
+      {
+        id: 5,
+        name: "ФИО",
+        path: "fio",
+        selected: false,
+        ascendingOrder: true,
+      }, //0
+      {
+        id: 1,
+        name: "почта",
+        path: "email",
+        selected: false,
+        ascendingOrder: true,
+      }, //1
+      {
+        id: 2,
+        name: "отдел",
+        path: "division",
+        selected: false,
+        ascendingOrder: true,
+      }, //2
+      {
+        id: 3,
+        name: "должность",
+        path: "post",
+        selected: false,
+        ascendingOrder: true,
+      }, //3
+      {
+        id: 6,
+        name: "дата рождения",
+        path: "birthday",
+        selected: false,
+        ascendingOrder: true,
+      }, //4
     ],
 
     alreadyScrolled: true,
