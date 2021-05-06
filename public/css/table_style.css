@@ -435,6 +435,7 @@ html {
 .content-table {
   margin: none;
   /* width: 1320px; */
+  width: 100%;
   font-style: normal;
   border-collapse: collapse;
   table-layout: fixed;

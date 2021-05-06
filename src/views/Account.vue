@@ -59,11 +59,10 @@
           <!-- v-if="!(isAdmin && width >= 1170)" -->
           <div class="card__employee__account__user-account-info">
             <p class="card__employee__account-text">
-              {{ lastname }} {{ firstname }} {{ middlename }}  
+              {{ lastname }} {{ firstname }} {{ middlename }}
             </p>
             <p class="card__employee__account-text">
-              
-               {{ dateOfBirth | date("date") }}
+              {{ dateOfBirth | date("date") }}
             </p>
             <p class="card__employee__account-text">{{ email }}</p>
             <p class="card__employee__account-text">{{ department }}</p>
@@ -75,7 +74,7 @@
             >
               Выход
             </button>
-          </div>        
+          </div>
         </div>
 
         <div class="card__wrap"></div>
@@ -136,7 +135,7 @@
             Сохранить
           </button>
           <a
-          href="https://magnit-server.herokuapp.com/msal4jsample/sign_out"
+            href="https://magnit-server.herokuapp.com/msal4jsample/sign_out"
             @click.prevent="logout"
             class="card__employee__account__button-exit-mobile light-hover"
           >
@@ -190,7 +189,7 @@ export default {
     phones: [],
 
     // isAdmin: true,
-    isAdmin: true,
+    isAdmin: false, // на этой странице админ = админ или модератор
 
     firstname: "",
     oldFirstname: "",
@@ -207,8 +206,7 @@ export default {
     department: "",
     oldDepartment: "",
 
-   
-    email: "test_admin@magnitversion2.onmicrosoft.com",   
+    email: "",
     dateOfBirth: "",
     avatar: null,
     loading: true,
@@ -243,8 +241,42 @@ export default {
     ConfirmAdminSaving,
     ConfirmNumber,
   },
-  async mounted() {},
+  async mounted() {
+    // console.log(this.$route.query.userInfo);
+    // let name = "userPrincipalName";
+    // let str = this.$route.query.userInfo;
+    // let pos = str.indexOf(name)
+    // let startIndexOf = str.indexOf(`"`, pos + name.length + 1) + 1;
+    // let last_indexOf = str.indexOf(`"`, startIndexOf);
+    // this.email = str.slice(startIndexOf, last_indexOf);
+    // console.log(this.email);
+  },
+
   async created() {
+    if (!document.cookie) {
+
+      if (!this.$route.query.userInfo){
+        this.$router.push("/")
+      }
+      let name = "userPrincipalName";
+      let str = this.$route.query.userInfo;
+      
+      let pos = str.indexOf(name);
+      let startIndexOf = str.indexOf(`"`, pos + name.length + 1) + 1;
+      let last_indexOf = str.indexOf(`"`, startIndexOf);
+      this.email = str.slice(startIndexOf, last_indexOf);
+      console.log(this.email);
+      document.cookie = `email=${this.email}`;
+      console.log(document.cookie);
+    } else {
+      let str = document.cookie;
+      let key = `email=`;
+      let startIndexOf = str.indexOf(key) + key.length;
+      let last_indexOf = str.indexOf(`;`, startIndexOf);
+      this.email = str.slice(startIndexOf, last_indexOf);
+      console.log(this.email);
+    }
+
     this.updateWidth();
     window.addEventListener("resize", this.updateWidth);
     // axios.defaults.headers.common["Authorization"] = `${this.email}`;
@@ -252,11 +284,22 @@ export default {
       .get(`${process.env.VUE_APP_PROXY}/user`, {
         headers: {
           Authorization: this.email,
-         'Access-Control-Allow-Origin': '*',
+          "Access-Control-Allow-Origin": "*",
         },
       })
       .then((response) => {
         if (response.data) {
+          if (
+            response.data.status.status == 2 ||
+            response.data.status.status == 3
+          ) {
+            this.isAdmin = true;
+            document.cookie = `stat=2`;
+          } else {
+            this.isAdmin = false;
+            document.cookie = `stat=0`;
+          }
+          console.log(response.data)
           this.avatar = response.data.avatar;
           this.firstname = response.data.first_name || "";
           this.oldFirstname = response.data.first_name || "";
@@ -267,17 +310,14 @@ export default {
           this.post = response.data.post || "";
           this.oldPost = response.data.post || "";
           this.department = response.data.division || "";
-          this.oldDepartment = response.data.division || "";         
+          this.oldDepartment = response.data.division || "";
           this.dateOfBirth = response.data.birthday || new Date();
-
-
-    
 
           axios
             .get(`${process.env.VUE_APP_PROXY}/get_numbers`, {
               headers: {
                 Authorization: this.email,
-                 'Access-Control-Allow-Origin': '*',
+                "Access-Control-Allow-Origin": "*",
               },
             })
             .then((phones) => {
@@ -307,6 +347,12 @@ export default {
       });
   },
   methods: {
+    delete_cookie: (cookie_name) => {
+      let cookie_date = new Date(); // Текущая дата и время
+      cookie_date.setTime(cookie_date.getTime() - 1);
+      document.cookie = cookie_name +=
+        "=; expires=" + cookie_date.toGMTString();
+    },
     CloseSuccessAlert() {
       this.SuccessVisible = false;
     },
@@ -328,18 +374,18 @@ export default {
         this.SuccessMessage = `Номер ${number} успешно добавлен`;
         this.SuccessVisible = true;
       } else {
-        this.ErrorMessage = "Неверный код подтверждения! Попробуйте еще раз";
+        // this.ErrorMessage = "Неверный код подтверждения! Попробуйте еще раз";
+        this.ErrorMessage = response.data.comment;
         this.ErrorVisible = true;
       }
     },
 
-    async DeleteNumber(resp) {      
-
+    async DeleteNumber(resp) {
       this.ConfirmDeleteNumberVisible = false;
       if (!resp.answer) {
         return;
       }
-       this.loading = true;
+      this.loading = true;
       const idx = this.ConfirmDeleteNumberIndex;
 
       axios.defaults.headers.common["Authorization"] = `${this.email}`;
@@ -348,15 +394,16 @@ export default {
           `${process.env.VUE_APP_PROXY}/delete_number?phone=${this.phones[idx].oldPhone}`
         )
         .then((response) => {
-          if (response.data.status == "SUCCESS") {
-            // alert(`Номер ${this.phones[idx].phone} успешно удалён`);
+          if (response.data.status == "SUCCESS") {          
+           
             this.SuccessMessage = `Номер ${this.phones[idx].phone} успешно удалён`;
             this.SuccessVisible = true;
             this.phones.splice(idx, 1);
           } else {
             // alert("Ошибка соединения с сервером! Повторите попытку позже");
-            this.ErrorMessage =
-              "Ошибка соединения с сервером! Повторите попытку позже";
+            // this.ErrorMessage =
+            //   "Ошибка соединения с сервером! Повторите попытку позже";
+              this.ErrorMessage = response.data.comment
             this.ErrorVisible = true;
           }
         })
@@ -366,10 +413,13 @@ export default {
           this.ErrorMessage = "Что-то пошло не так";
           this.ErrorVisible = true;
         });
-         this.loading = false;
+      this.loading = false;
     },
     logout() {
-      alert("Выход");
+      this.delete_cookie("email"); 
+       this.delete_cookie("stat");
+      window.location.href =
+        "https://magnit-server.herokuapp.com/msal4jsample/sign_out";
     },
     checkPhones() {
       let allCorrect = true;
@@ -404,7 +454,19 @@ export default {
           }`
         )
         .then((response) => {
-          // здесь обработка ответа сервера
+          console.log(response.data);
+
+          //  if (response.data.status == "SUCCESS") {
+          //   // здесь обработка ответа сервера для подтверждения номера
+          // this.NumberToConfirm = this.phones[this.phones.length - 1].phone;
+          // this.ConfirmNumberVisible = true;
+          // } else {            
+          //   this.ErrorMessage = response.data.comment;
+          //   this.ErrorVisible = true;
+          //   }
+
+
+          // здесь обработка ответа сервера для подтверждения номера
           this.NumberToConfirm = this.phones[this.phones.length - 1].phone;
           this.ConfirmNumberVisible = true;
         })
@@ -478,7 +540,6 @@ export default {
 </script>
 
 <style lang="scss">
-
 @import "../../public/css/style.css";
 
 .lk-loader {

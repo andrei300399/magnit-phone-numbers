@@ -434,7 +434,7 @@ export default {
         first_name: `${this.firstname}`,
         last_name: `${this.lastname}`,
         middle_name: `${this.middlename}`,
-        // birthday: `${new Date(this.dateOfBirth)}`,
+        birthday: `${this.dateOfBirth}`,
         post: `${this.post}`,
         division: `${this.department}`,
       };

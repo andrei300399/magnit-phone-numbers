@@ -349,10 +349,10 @@ export default {
           this.oldPost = response.data.post || "";
           this.department = response.data.division || "";
           this.oldDepartment = response.data.division || "";
-          // this.dateOfBirth =
-          //   (new Date(response.data.birthday)).toLocaleDateString();
+          this.dateOfBirth = 
+            (new Date(response.data.birthday)).toLocaleDateString();
           console.log(response.data.birthday);
-          this.dateOfBirth = String(response.data.birthday).substring(0, 10);
+         this.oldDateOfBirth = this.dateOfBirth;
           console.log(this.dateOfBirth);
 
           axios
@@ -411,7 +411,7 @@ export default {
       if (this.lastname != this.oldLastname) {
         axios.defaults.headers.common["Authorization"] = `${this.email}`;
         await axios
-          .post(
+          .get(
             `${process.env.VUE_APP_PROXY}/change_last_name?last_name=${this.lastname}`
           )
           .then((response) => {
@@ -427,7 +427,7 @@ export default {
       if (this.firstname != this.oldFirstname) {
         axios.defaults.headers.common["Authorization"] = `${this.email}`;
         await axios
-          .post(
+          .get(
             `${process.env.VUE_APP_PROXY}/change_first_name?first_name=${this.firstname}`
           )
           .then((response) => {
@@ -443,7 +443,7 @@ export default {
       if (this.middlename != this.oldMiddlename) {
         axios.defaults.headers.common["Authorization"] = `${this.email}`;
         await axios
-          .post(
+          .get(
             `${process.env.VUE_APP_PROXY}/change_middle_name?middle_name=${this.middlename}`
           )
           .then((response) => {
@@ -459,7 +459,7 @@ export default {
       if (this.post != this.oldPost) {
         axios.defaults.headers.common["Authorization"] = `${this.email}`;
         await axios
-          .post(`${process.env.VUE_APP_PROXY}/change_post?post=${this.post}`)
+          .get(`${process.env.VUE_APP_PROXY}/change_post?post=${this.post}`)
           .then((response) => {
             if (response.data.status == "SUCCESS") {
               this.oldPost = this.post;
@@ -473,12 +473,31 @@ export default {
       if (this.department != this.oldDepartment) {
         axios.defaults.headers.common["Authorization"] = `${this.email}`;
         await axios
-          .post(
+          .get(
             `${process.env.VUE_APP_PROXY}/change_division?division=${this.department}`
           )
           .then((response) => {
             if (response.data.status == "SUCCESS") {
               this.oldDepartment = this.department;
+            } else {
+            }
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+      }
+      if (this.dateOfBirth != this.oldDateOfBirth) {
+        axios.defaults.headers.common["Authorization"] = `${this.email}`;
+          const json = {       
+        birthday:  `${this.dateOfBirth}`,       
+      };
+        await axios
+          .get(
+            `${process.env.VUE_APP_PROXY}/change_birthday?birthday=${this.dateOfBirth}`
+          )
+          .then((response) => {
+            if (response.data.status == "SUCCESS") {
+              this.oldDateOfBirth = this.dateOfBirth;
             } else {
             }
           })

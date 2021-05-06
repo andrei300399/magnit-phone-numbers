@@ -3,7 +3,7 @@
     <nav class="nav">
       <ul class="nav__list">
         <li class="nav__list__item">
-          <a class="light-hover nav-text" href="#">Администратор</a>
+          <a class="light-hover nav-text" href="#">{{ status }}</a>
         </li>
         <li class="nav__list__item">
           <a class="light-hover nav-text" href="#">
@@ -27,8 +27,8 @@
             <p class="nav__list__togler__item" v-on:click.prevent="goToLk()">
               <a class="nav-text">Личный кабинет</a>
             </p>
-            <p class="nav__list__togler__item" v-on:click.prevent="logout()">
-              <a class="nav-text">Выход</a>
+            <p class="nav__list__togler__item">
+              <a v-on:click.prevent="logout()" class="nav-text">Выход</a>
             </p>
           </div>
         </li>
@@ -68,6 +68,7 @@
     />
 
     <vue-context
+      v-if="isAdmin"
       ref="menu"
       :close-on-click="true"
       :close-on-scroll="true"
@@ -420,11 +421,12 @@ export default {
     category: 6, // хранится айдишник
 
     users: [],
-    isAdmin: true,
-    firstname: "Вадим",
-    middlename: "Геннадьевич",
-    lastname: "Пак",
-    email: "pack.vg@agabon.ru",
+    isAdmin: false, // на этой странице админ = только админ
+    firstname: "",
+    middlename: "",
+    lastname: "",
+    email: "",
+    status: "",
 
     ConfirmDeleteUserVisible: false,
     ConfirmDeleteUserMessage: "",
@@ -523,27 +525,112 @@ export default {
   validations: {
     categories: { required, minLength: minLength(3) },
   },
-  async mounted() {
+  async created() {
+    let str = document.cookie;
+    let key = `email=`;
+    let startIndexOf = str.indexOf(key) + key.length;
+    let last_indexOf = str.indexOf(`;`, startIndexOf);
+    this.email = str.slice(startIndexOf, last_indexOf);
+
+    await axios
+      .get(`${process.env.VUE_APP_PROXY}/user`, {
+        headers: {
+          Authorization: this.email,
+          "Access-Control-Allow-Origin": "*",
+        },
+      })
+      .then((response) => {
+        if (response.data) {
+          console.log(response.data);
+          this.firstname = response.data.first_name || "";
+          this.middlename = response.data.middle_name || "";
+          this.lastname = response.data.last_name || "";
+          if (response.data.status.status == 2) {
+            this.isAdmin = true;
+            this.status = "Администратор";
+          } else if (response.data.status.status == 3) {
+            this.isAdmin = false;
+            this.status = "Модератор";
+          } else {
+            this.goToLk();
+          }
+        } else {
+          //
+        }
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+
     await this.fetch();
   },
+  async mounted() {
+    // console.log(document.cookie);
+    // let str = document.cookie;
+    // let key = `email=`;
+    // let startIndexOf = str.indexOf(key) + key.length;
+    // this.email = str.slice(startIndexOf);
+    // console.log(this.email);
+    // await axios
+    //   .get(`${process.env.VUE_APP_PROXY}/user`, {
+    //     headers: {
+    //       Authorization: this.email,
+    //       "Access-Control-Allow-Origin": "*",
+    //     },
+    //   })
+    //   .then((response) => {
+    //     if (response.data) {
+    //       console.log(response.data);
+    //       this.firstname = response.data.first_name || "";
+    //       this.middlename = response.data.middle_name || "";
+    //       this.lastname = response.data.last_name || "";
+    //       if (response.data.status.status == 2) {
+    //         this.isAdmin = true;
+    //         this.status = "Администратор";
+    //       } else if (response.data.status.status == 3) {
+    //         this.isAdmin = false;
+    //         this.status = "Модератор";
+    //       } else {
+    //         this.goToLk();
+    //       }
+    //     } else {
+    //       //
+    //     }
+    //   })
+    //   .catch((err) => {
+    //     console.log(err);
+    //   });
+    // await this.fetch();
+  },
   methods: {
+    delete_cookie: (cookie_name) => {
+      let cookie_date = new Date(); // Текущая дата и время
+      cookie_date.setTime(cookie_date.getTime() - 1);
+      document.cookie = cookie_name +=
+        "=; expires=" + cookie_date.toGMTString();
+    },
     async clearSearch() {
       if (this.searchString !== "") {
+        console.log("Строка поиска не пуста")
         return;
       }
+      console.log("Строка поиска пуста")
+
       this.loading = true;
       this.search = false;
       this.users = [];
-      console.log("Пусто - выросла капуста!");
+     
       this.indexOfLastUser = -1;
       if (this.sorted) {
-        this.get = false;
+        this.get = true;
+        this.hasJSON = false;
         this.path = `sort_${this.sortCategory[this.sortIndex].path}?`;
         await this.fetch();
         return;
       }
 
       this.get = true;
+      this.hasJSON = false;
       this.path = this.defaultPath;
       await this.fetch();
     },
@@ -662,7 +749,8 @@ export default {
         this.json = JSON.parse(strJson);
         this.path = `search_and_sort?`;
       } else {
-        this.hasJSON = false;
+        this.hasJSON = false; 
+        this.get = true;
         this.path = `search_${this.searchCategory[indexOfSearchCategory].path}?${this.searchCategory[indexOfSearchCategory].path}=${this.searchString}&`;
       }
 
@@ -684,6 +772,7 @@ export default {
         this.sortIndex = -1;
         this.sorted = false;
         this.hasJSON = false;
+         this.get = true;
 
         if (this.search) {
           //если был осуществлен поиск, результат будет выведен уже без учета сортировки
@@ -715,6 +804,7 @@ export default {
         //если был осуществлен поиск, результат будет выведен уже с учетом сортировки
 
         this.hasJSON = true;
+         this.get = false;
 
         let indexOfSearchCategory; // = 0;
         for (let i = 0; i < this.searchCategory.length; i++) {
@@ -723,7 +813,7 @@ export default {
             break;
           }
         }
-        // потом проверить
+       
         let strJson = `{
           "search": ${this.category},
           "sort": ${this.sortCategory[this.sortIndex].id},
@@ -735,7 +825,7 @@ export default {
         this.json = JSON.parse(strJson);
         this.path = `search_and_sort?`;
       } else {
-        this.get = false;
+        this.get = true;
         this.path = `sort_${this.sortCategory[index].path}?`;
       }
       this.users = [];
@@ -745,16 +835,23 @@ export default {
     },
 
     onContextClickEdit(event, formData) {
-      console.log(
-        "Редактировать пользователя " + this.users[formData.idx].last_name
-      );
-      console.log("email " + this.users[formData.idx].email);
+      if (!this.isAdmin) {
+        // alert("У вас нет прав для редактирования!")
+        this.SuccessMessage = `У вас нет прав для редактирования!`;
+        this.SuccessVisible = true;
+        return;
+      }
 
       this.editUserEmail = this.users[formData.idx].email;
       this.editUserFormVisible = true;
     },
 
     onContextClickRemove(event, formData) {
+      if (!this.isAdmin) {
+        this.SuccessMessage = `У вас нет прав для удаления!`;
+        this.SuccessVisible = true;
+        return;
+      }
       this.ConfirmDeleteUserMessage = `Вы действительно хотите удалить пользователя ${
         this.users[formData.idx].last_name
       } ${this.users[formData.idx].first_name} ${
@@ -789,6 +886,13 @@ export default {
     },
 
     AddNewUser() {
+      if (!this.isAdmin) {
+        // alert("У вас нет прав для добавления пользователя!");
+        this.SuccessMessage = `У вас нет прав для добавления пользователя!`;
+        this.SuccessVisible = true;
+        return;
+      }
+
       this.addUserFormVisible = true;
     },
 
@@ -814,33 +918,7 @@ export default {
 
     async fetch() {
       //выполнение гет-запроса
-      if (this.get) {
-        console.log("get");
-        await axios
-          .get(
-            `${process.env.VUE_APP_PROXY}/${this.path}start_index=${
-              this.indexOfLastUser + 1
-            }&last_index=${this.indexOfLastUser + this.LoadedAtOnced}`
-          )
-          .then((response) => {
-            let tempUsers = response.data;
-            for (let i = 0; i < tempUsers.length; i++) {
-              if (tempUsers[i].numbers.length === 0) {
-                tempUsers[i].numbers.push({ number: "-" });
-              }
-            }
-
-            this.users.push(...tempUsers);
-            this.indexOfLastUser += this.LoadedAtOnced;
-            this.loading = false;
-            this.alreadyScrolled = false;
-          })
-          .catch((err) => {
-            console.log(err);
-          });
-        return;
-      }
-
+     
       //выполнение пост-запросов
       //Если передается JSON
       if (this.hasJSON) {
@@ -871,29 +949,57 @@ export default {
 
         return;
       }
-      console.log("post + without JSON");
-      await axios
-        .post(
-          `${process.env.VUE_APP_PROXY}/${this.path}start_index=${
-            this.indexOfLastUser + 1
-          }&last_index=${this.indexOfLastUser + this.LoadedAtOnced}`
-        )
-        .then((response) => {
-          let tempUsers = response.data;
-          for (let i = 0; i < tempUsers.length; i++) {
-            if (tempUsers[i].numbers.length === 0) {
-              tempUsers[i].numbers.push({ number: "-" });
-            }
-          }
 
-          this.users.push(...tempUsers);
-          this.indexOfLastUser += this.LoadedAtOnced;
-          this.loading = false;
-          this.alreadyScrolled = false;
-        })
-        .catch((err) => {
-          console.log(err);
-        });
+      //  if (this.get) {
+        console.log("get");
+        await axios
+          .get(
+            `${process.env.VUE_APP_PROXY}/${this.path}start_index=${
+              this.indexOfLastUser + 1
+            }&last_index=${this.indexOfLastUser + this.LoadedAtOnced}`
+          )
+          .then((response) => {
+            let tempUsers = response.data;
+            for (let i = 0; i < tempUsers.length; i++) {
+              if (tempUsers[i].numbers.length === 0) {
+                tempUsers[i].numbers.push({ number: "-" });
+              }
+            }
+            console.log(tempUsers)
+            this.users.push(...tempUsers);
+            this.indexOfLastUser += this.LoadedAtOnced;
+            this.loading = false;
+            this.alreadyScrolled = false;
+          })
+          .catch((err) => {
+            console.log(err);
+          });
+        return;
+      // }
+
+      // console.log("post + without JSON");
+      // await axios
+      //   .post(
+      //     `${process.env.VUE_APP_PROXY}/${this.path}start_index=${
+      //       this.indexOfLastUser + 1
+      //     }&last_index=${this.indexOfLastUser + this.LoadedAtOnced}`
+      //   )
+      //   .then((response) => {
+      //     let tempUsers = response.data;
+      //     for (let i = 0; i < tempUsers.length; i++) {
+      //       if (tempUsers[i].numbers.length === 0) {
+      //         tempUsers[i].numbers.push({ number: "-" });
+      //       }
+      //     }
+
+      //     this.users.push(...tempUsers);
+      //     this.indexOfLastUser += this.LoadedAtOnced;
+      //     this.loading = false;
+      //     this.alreadyScrolled = false;
+      //   })
+      //   .catch((err) => {
+      //     console.log(err);
+      //   });
     },
 
     goToLk() {
@@ -901,8 +1007,10 @@ export default {
     },
 
     logout() {
-      alert("Вы вышли из системы");
-      this.$router.push("./");
+      this.delete_cookie("email");
+      this.delete_cookie("stat");
+      window.location.href =
+        "https://magnit-server.herokuapp.com/msal4jsample/sign_out";
     },
 
     saveAsFile: function () {
